@@ -1,6 +1,6 @@
 "use string";
 import _ from "lodash";
-import Snoowrap from "snoowrap";
+import Snoowrap, { Subreddit } from "snoowrap";
 import
 {
   InboxStream,
@@ -12,7 +12,7 @@ import cleverbot from "cleverbot-free";
 import { generateEmojipasta } from "./emojipasta/emojifier";
 import { parse } from "jsonc-parser";
 import { readFileSync } from "fs";
-import { IConfig } from "./ConfigInterface"
+import { IConfig } from "./ConfigInterface";
 import
 {
   yellow,
@@ -23,7 +23,6 @@ import
 }
   from "colors";
 import submissionhandler from "./handler/SubmissionHandler";
-
 
 const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8" }));
 const keys: Array<Snoowrap.SnoowrapOptions> = parse(readFileSync("./apikeys.jsonc", { encoding: "utf-8" }), [], {
@@ -59,9 +58,9 @@ snoowrap.getMe().then(async (redditor: Snoowrap.RedditUser) =>
       ²==--≥²²==--==²²≤--==²`);
 });
 
-const subredditToPostOn: Array<string> = config.subredditToListen
+const subredditToPostOn: Array<string> = config.subredditToListen;
 
-for (let subreddit of subredditToPostOn)
+for (const subreddit of subredditToPostOn)
 {
   /* set up the event */
   const submissionStream = new SubmissionStream(snoowrap, {
@@ -77,6 +76,8 @@ for (let subreddit of subredditToPostOn)
 const inboxStream = new InboxStream(snoowrap, config.inboxStreamOption);
 
 let iteration = 0;
+const replied_m = "tion";
+
 inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment) =>
 {
   /* if (_.random(0, 1_000) % 95 === 0)
@@ -85,7 +86,7 @@ inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment)
     return;
   } */
   iteration++;
-  if (iteration % 50 === 0)
+  if (iteration % 50 === 0 && !detectDebug())
     console.clear();
   /**
    * The notification message
@@ -93,6 +94,7 @@ inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment)
   const notif_body: string = notif.body;
   try
   {
+    let convo_history = notif.parent_id;
     let reply: string = await cleverbot(notif_body);
     if (config.shouldEmogify)
       reply = generateEmojipasta(reply);
@@ -108,20 +110,35 @@ inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment)
         .then(() =>
         {
           //@ts-ignore
-          console.log(rainbow("Replied to comment!"));
+          if (!detectDebug()) // detect for debug cuz i want to show the amount of time submission have been replied to as I use chrome debugger to debug
+            console.log(rainbow(replied_m));
+          else
+            console.log(replied_m);
         })
         .catch(() => { });
-      console.log(rainbow("Replied to comment!"));
+      if (!detectDebug())
+        console.log(rainbow(replied_m));
+      else
+        console.log(replied_m);
     }, _.random(5000, 22000));
   }
+
   catch (e)
   {
+
     console.error(generateEmojipasta(e.toString()));
     // sleep.msleep(_.random(2000, 22000));
     notif.reply(e.toString())
       //@ts-ignore
       .then(() => { })
       .catch(() => { });
-    console.log(rainbow("Replied to notif!"));
+    if (!detectDebug())
+      console.log(rainbow(replied_m))
+    else
+      console.log(replied_m);
   }
 });
+var detectDebug = function ()
+{
+  return process.env.NODE_ENV !== 'production';
+};

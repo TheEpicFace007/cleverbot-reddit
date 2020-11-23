@@ -76,7 +76,7 @@ for (const subreddit of subredditToPostOn)
 const inboxStream = new InboxStream(snoowrap, config.inboxStreamOption);
 
 let iteration = 0;
-const replied_m = "tion";
+const replied_m = "Replied to a comment!";
 
 inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment) =>
 {

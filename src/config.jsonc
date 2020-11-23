@@ -1,0 +1,44 @@
+{
+  /* emoji settings */
+  // Turn this on if you want to enable the bot to emojify message
+  // It'll turn the message into somethign that look like a emojipasta
+  "shouldEmojify": false,
+  "maxEmojiPerBlock": 2,
+  /* inbox watcher settings: */
+  "inboxStreamOption": {
+    // The limit of message to look for per poll time
+    // Don't set it too high or you might get ratelimited
+    // The default value is 25
+    "limit": 25,
+    // Amount of millisecond it'll look for message in the inbox of the bot
+    // The lower it'l be, the higher the chance of you getting rate limited 
+    // is (Don't set it too low!)
+    // The default value is 22000
+    "pollTime": 22000,
+    // Filter - The scope of messages it'll look into
+    // Possible valie are the following:
+    // inbox, unread, messages, comments, selfreply, mentions
+    // The default value is inbox
+    "filter": "inbox"
+  },
+  /* submission watcher setting */
+  "submittionStreamOption": {
+    // The limit of submission to look for per poll time
+    // Don't set it too high or you might get ratelimited
+    // The default value is 10
+    "limit": 10,
+    // Amount of millisecond it'll look for message in the inbox of the bot
+    // The lower it'l be, the higher the chance of you getting rate limited 
+    // is (Don't set it too low!)
+    // The default value is 22000
+    "pollTime": 22000
+  },
+  /* subreddit option */
+  // Set the subreddit to listen for posts
+  // You can set to r/all 
+  "subredditToListen": [
+    "copypasta",
+    "teenagers",
+    "askredditafterdark"
+  ]
+}

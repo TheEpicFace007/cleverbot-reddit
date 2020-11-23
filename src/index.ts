@@ -100,6 +100,7 @@ inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment)
       reply = generateEmojipasta(reply);
     // sleep.msleep(_.random(2000, 22000));
     let i = 0;
+    const ms = _.random(5000, 22000);
     setTimeout(() =>
     {
       i++;
@@ -120,7 +121,7 @@ inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment)
         console.log(rainbow(replied_m));
       else
         console.log(replied_m);
-    }, _.random(5000, 22000));
+    }, ms);
   }
 
   catch (e)

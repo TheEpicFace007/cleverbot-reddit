@@ -1,4 +1,4 @@
-"use string";
+"use strict";
 import _ from "lodash";
 import Snoowrap, { Subreddit } from "snoowrap";
 import
@@ -23,6 +23,7 @@ import
 }
   from "colors";
 import submissionhandler from "./handler/SubmissionHandler";
+import inboxHandler from "./handler/InboxHandler"
 
 const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8" }));
 const keys: Array<Snoowrap.SnoowrapOptions> = parse(readFileSync("./apikeys.jsonc", { encoding: "utf-8" }), [], {
@@ -46,7 +47,7 @@ snoowrap.getMe().then(async (redditor: Snoowrap.RedditUser) =>
   '$                          $'    ${underline("Account stat:")}
   '$.     .,        ,.     .$'       Submission karma: ${blue(redditor.link_karma.toString())}
   'b,     '²«»«»«»²'     ,d'         Comment karma: ${blue(redditor.comment_karma.toString())}
-     '²?bn,,          ,,nd?²'       
+     '²?bn,,          ,,nd?²'        Is the bot banned from reddit? ${redditor.is_suspended ? "Yes" : "No"}
        ,6$ ''²²²²²²²²'' $6,
      ,² ²$              $² ²,
      $  :$              $:  $
@@ -78,68 +79,6 @@ const inboxStream = new InboxStream(snoowrap, config.inboxStreamOption);
 let iteration = 0;
 const replied_m = "Replied to a comment!";
 
-inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment) =>
-{
-  /* if (_.random(0, 1_000) % 95 === 0)
-  {
-    console.log(green("The random decided to not answer the on the comment."));
-    return;
-  } */
-  iteration++;
-  if (iteration % 50 === 0 && !detectDebug())
-    console.clear();
-  /**
-   * The notification message
-   */
-  const notif_body: string = notif.body;
-  try
-  {
-    let convo_history = notif.parent_id;
-    let reply: string = await cleverbot(notif_body);
-    if (config.shouldEmogify)
-      reply = generateEmojipasta(reply);
-    // sleep.msleep(_.random(2000, 22000));
-    let i = 0;
-    const ms = _.random(5000, 22000);
-    setTimeout(() =>
-    {
-      i++;
-      if (i > 1)
-        return Promise.resolve();
-      notif.reply(reply)
-        //@ts-ignore
-        .then(() =>
-        {
-          //@ts-ignore
-          if (!detectDebug()) // detect for debug cuz i want to show the amount of time submission have been replied to as I use chrome debugger to debug
-            console.log(rainbow(replied_m));
-          else
-            console.log(replied_m);
-        })
-        .catch(() => { });
-      if (!detectDebug())
-        console.log(rainbow(replied_m));
-      else
-        console.log(replied_m);
-    }, ms);
-  }
+inboxStream.on("item", inboxHandler);
 
-  catch (e)
-  {
-
-    console.error(generateEmojipasta(e.toString()));
-    // sleep.msleep(_.random(2000, 22000));
-    notif.reply(e.toString())
-      //@ts-ignore
-      .then(() => { })
-      .catch(() => { });
-    if (!detectDebug())
-      console.log(rainbow(replied_m))
-    else
-      console.log(replied_m);
-  }
-});
-var detectDebug = function ()
-{
-  return process.env.NODE_ENV !== 'production';
-};
+export = { snoowrap };

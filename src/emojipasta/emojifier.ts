@@ -6,8 +6,9 @@ const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8"
 
 export function generateEmojipasta(text: any)
 {
-  let blocks = splitIntoBlocks(text);
-  let newBlocks = [];
+  let blocks: Array<RegExpMatchArray> | null = splitIntoBlocks(text);
+  let newBlocks: Array<string> = [];
+  //@ts-ignore
   blocks.forEach((block: any) =>
   {
     newBlocks.push(block);
@@ -20,8 +21,9 @@ export function generateEmojipasta(text: any)
   return newBlocks.join("");
 }
 
-function splitIntoBlocks(text: string)
+function splitIntoBlocks(text: string): Array<RegExpMatchArray> | null
 {
+  //@ts-ignore
   return text.match(/\s*[^\s]*/g);
 }
 
@@ -47,11 +49,12 @@ function trimNonAlphanumericalChars(text: string)
   return text.replace(/^\W*/, "").replace(/\W*$/, "");
 }
 
-function getMatchingEmojis(word: string)
+function getMatchingEmojis(word: string): Array<string>
 {
   let key: any = getAlphanumericPrefix(word.toLowerCase());
   if (key in EMOJI_MAPPINGS)
   {
+    //@ts-ignore
     return EMOJI_MAPPINGS[key];
   }
   return [];

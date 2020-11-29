@@ -1,4 +1,5 @@
-import { InboxStreamOptions, SubmissionStream } from "snoostorm";
+import { InboxStreamOptions, SnooStormOptions, SubmissionStream } from "snoostorm";
+import Snoowrap from "snoowrap";
 
 export interface ISubmittionStreamOption
 {

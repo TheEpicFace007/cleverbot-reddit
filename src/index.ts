@@ -7,11 +7,10 @@ import
   SubmissionStream
 } from "snoostorm";
 import "colors/lib/extendStringPrototype";
-process.chdir("./src/");
 import cleverbot from "cleverbot-free";
 import { generateEmojipasta } from "./emojipasta/emojifier";
 import { parse } from "jsonc-parser";
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import { IConfig } from "./ConfigInterface";
 import
 {
@@ -24,6 +23,8 @@ import
   from "colors";
 import submissionhandler from "./handler/SubmissionHandler";
 import inboxHandler from "./handler/InboxHandler"
+import { table } from "console";
+
 
 const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8" }));
 const keys: Array<Snoowrap.SnoowrapOptions> = parse(readFileSync("./apikeys.jsonc", { encoding: "utf-8" }), [], {
@@ -61,7 +62,7 @@ snoowrap.getMe().then(async (redditor: Snoowrap.RedditUser) =>
 
 const subredditToPostOn: Array<string> = config.subredditToListen;
 
-for (const subreddit of subredditToPostOn)
+for (const subreddit  of subredditToPostOn)
 {
   /* set up the event */
   const submissionStream = new SubmissionStream(snoowrap, {
@@ -74,6 +75,7 @@ for (const subreddit of subredditToPostOn)
 
   submissionStream.on("item", submissionhandler);
 }
+//@ts-ignore
 const inboxStream = new InboxStream(snoowrap, config.inboxStreamOption);
 
 let iteration = 0;
@@ -81,4 +83,4 @@ const replied_m = "Replied to a comment!";
 
 inboxStream.on("item", inboxHandler);
 
-export = { snoowrap };
+export default snoowrap

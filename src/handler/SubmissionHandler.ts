@@ -9,7 +9,7 @@ import { random as rainbow } from "colors";
 import { IConfig } from "../ConfigInterface";
 import detectDebug from "../detectDebug";
 
-const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8" }));
+const config: IConfig = parse(readFileSync("./src/config.jsonc", { encoding: "utf-8" }));
 let iteration = 0;
 
 export default async function submissionHandler(submission: Snoowrap.Submission): Promise<void>

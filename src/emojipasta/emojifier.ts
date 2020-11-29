@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "fs";
 import { parse } from "jsonc-parser"
 import { IConfig } from "../ConfigInterface";
 import EMOJI_MAPPINGS from "./emoji_mapping.json"
-const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8"}))
+const config: IConfig = parse(readFileSync("./src/config.jsonc", { encoding: "utf-8"}))
 
 export function generateEmojipasta(text: any)
 {

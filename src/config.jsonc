@@ -37,6 +37,6 @@
   // Set the subreddit to listen for posts
   // You can set to r/all 
   "subredditToListen": [
-    "teenagers",
+    "askreddit",
   ]
 }

@@ -18,7 +18,8 @@ import
   blue,
   green,
   underline,
-  random as rainbow
+  random as rainbow,
+  bold
 }
   from "colors";
 import submissionhandler from "./handler/SubmissionHandler";
@@ -27,6 +28,7 @@ import { table } from "console";
 
 
 const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8" }));
+Object.freeze(config);
 const keys: Array<Snoowrap.SnoowrapOptions> = parse(readFileSync("./apikeys.jsonc", { encoding: "utf-8" }), [], {
   allowTrailingComma: true
 });
@@ -48,7 +50,7 @@ snoowrap.getMe().then(async (redditor: Snoowrap.RedditUser) =>
   '$                          $'    ${underline("Account stat:")}
   '$.     .,        ,.     .$'       Submission karma: ${blue(redditor.link_karma.toString())}
   'b,     '²«»«»«»²'     ,d'         Comment karma: ${blue(redditor.comment_karma.toString())}
-     '²?bn,,          ,,nd?²'        Is the bot banned from reddit? ${redditor.is_suspended ? "Yes" : "No"}
+     '²?bn,,          ,,nd?²'        Is the bot banned from reddit? ${redditor.is_suspended ? bold("Yes it is banned") : bold("No it is not banned")}
        ,6$ ''²²²²²²²²'' $6,
      ,² ²$              $² ²,
      $  :$              $:  $

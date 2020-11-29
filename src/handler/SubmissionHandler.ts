@@ -10,6 +10,7 @@ import { IConfig } from "../ConfigInterface";
 import detectDebug from "../detectDebug";
 
 const config: IConfig = parse(readFileSync("./src/config.jsonc", { encoding: "utf-8" }));
+Object.freeze(config)
 let iteration = 0;
 
 export default async function submissionHandler(submission: Snoowrap.Submission): Promise<void>
@@ -18,13 +19,16 @@ export default async function submissionHandler(submission: Snoowrap.Submission)
   iteration++;
   if (iteration % 50 === 0 && !detectDebug())
     console.clear();
+  /* do not reply if it's a serious thread from askreddit */
+  if (JSON.stringify(submission).toLowerCase().search("serious") > 0)
+    return;
   /* generate the reply */
   let reply: string = await cleverbot(`${submission.title} ${submission.selftext}`);
   if (config.shouldEmogify)
     reply = generateEmojipasta(reply);
   
   /* finally reply */
-  const ms: number = _.random(1000, 22000, false);
+  const ms: number = _.random(5000, 22000, false);
   const timeout: NodeJS.Timeout = setTimeout(() => 
   {
     submission.reply(reply)

@@ -12,19 +12,20 @@ import
 {
   random as rainbow
 }
-from "colors";
+  from "colors";
 import detectDebug from "../detectDebug";
-import csvdb  from "csv-database"
-import snoowrap  from "../index"
+import csvdb from "csv-database";
+import snoowrap from "../index";
 
 const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8" }));
+Object.freeze(config);
 
 let iteration: number = 0;
 const replied_m: string = "Replied to an inbox message";
 export default async function (notif: Snoowrap.PrivateMessage | Snoowrap.Comment): Promise<void>
 {
   //@ts-ignore
-  const BanDB = csvdb("./src/ban.csv", [
+  const BanDB = csvdb("ban.csv", [
     "subreddit",
     "ban note",
     "date of ban",
@@ -39,37 +40,56 @@ export default async function (notif: Snoowrap.PrivateMessage | Snoowrap.Comment
   const banNoteRegex: RegExp = /Note from the moderators\:\n\n(?<ban_note>.*)+/gm;
   let ban_note: RegExpExecArray | null | string = banNoteRegex.exec(notif.body);
   ban_note = banNoteRegex.exec(notif.body);
-  
+
   const subredditRegex: RegExp = /You can still view and subscribe to (?<subreddit>r\/(\w|_|-)+)/gm;
   if (banNoteRegex.test(notif.body))
   {
     ban_note = ban_note.groups.ban_note;
     console.info(`The bot has been banned from ${notif.author}\nBan reason:${ban_note}`);
-    
+
     const dateOfBan: Date = new Date();
-    BanDB.then((db) => {
+    BanDB.then((db) =>
+    {
       db.add([{
         "subreddit": notif.author,
         "ban note": ban_note,
         "date of ban": dateOfBan,
         "link to message": `https://www.reddit.com/message/messages/${notif.id.replace(/t_\d/, "")}`,
         "full ban message": notif.body
-      }])
-    })
+      }]);
+    });
     return;
   }
-
   /**
    * The notification message
    */
   const notif_body: string = notif.body;
-  const past_user_message: Snoowrap.Comment = snoowrap.getComment(notif.parent_id) // not to be confused with the bot message
-  const past_bot_message: Snoowrap.Comment = snoowrap.getComment(past_user_message.id)
-  
-  let reply: string = await cleverbot(notif_body, [
+  let past_user_message: Snoowrap.Comment;
+  let past_bot_message: Snoowrap.Comment;
+  let reply: string;
+  try
+  {
+    past_user_message = snoowrap.getComment(notif.parent_id); // not to be confused with the bot message
+  }
+  catch
+  {
+    //@ts-ignore
+    past_user_message = "";
+  }
+  try
+  {
+    past_bot_message = snoowrap.getComment(past_user_message.parent_id);
+  }
+  catch
+  {
+    //@ts-ignore
+    past_bot_message = ""
+  }
+
+  reply = await cleverbot(notif_body, [
     past_user_message.body,
     past_bot_message.body
-  ]);
+  ])
   if (config.shouldEmogify)
     reply = generateEmojipasta(reply);
 

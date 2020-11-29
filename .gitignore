@@ -2,4 +2,5 @@
 package-lock.json
 /dist
 tsconfig.tsbuildinfo
-/src/apikeys.jsonc
+src/apikeys.jsonc
+src/ban.csv

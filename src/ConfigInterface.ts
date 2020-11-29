@@ -1,4 +1,5 @@
-import { InboxStreamOptions, SubmissionStream } from "snoostorm";
+import { InboxStreamOptions, SnooStormOptions, SubmissionStream } from "snoostorm";
+import Snoowrap from "snoowrap";
 
 export interface ISubmittionStreamOption
 {
@@ -10,7 +11,15 @@ export interface IConfig
 {
   shouldEmogify: boolean;
   maxEmojiPerBlock: number;
-  inboxStreamOption: InboxStreamOptions,
-  submittionStreamOption: ISubmittionStreamOption,
-  subredditToListen: Array<string>
+
+  inboxStreamOption: InboxStreamOptions;
+  submittionStreamOption: ISubmittionStreamOption;
+  commentStreamOption: ISubmittionStreamOption;
+  
+  subredditToListen: Array<string>;
+
+  shouldListenForNewComment: boolean;
+  shouldListenForNewSubmission: boolean;
+  shouldListenToInbox: boolean;
+
 }

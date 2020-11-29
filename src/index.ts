@@ -1,17 +1,17 @@
-"use string";
+"use strict";
 import _ from "lodash";
 import Snoowrap, { Subreddit } from "snoowrap";
 import
 {
   InboxStream,
-  SubmissionStream
+  SubmissionStream,
+  CommentStream
 } from "snoostorm";
 import "colors/lib/extendStringPrototype";
-process.chdir("./src/");
 import cleverbot from "cleverbot-free";
 import { generateEmojipasta } from "./emojipasta/emojifier";
 import { parse } from "jsonc-parser";
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import { IConfig } from "./ConfigInterface";
 import
 {
@@ -19,12 +19,17 @@ import
   blue,
   green,
   underline,
-  random as rainbow
+  random as rainbow,
+  bold
 }
   from "colors";
 import submissionhandler from "./handler/SubmissionHandler";
+import inboxHandler from "./handler/InboxHandler";
+import { table } from "console";
+
 
 const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8" }));
+Object.freeze(config);
 const keys: Array<Snoowrap.SnoowrapOptions> = parse(readFileSync("./apikeys.jsonc", { encoding: "utf-8" }), [], {
   allowTrailingComma: true
 });
@@ -46,7 +51,7 @@ snoowrap.getMe().then(async (redditor: Snoowrap.RedditUser) =>
   '$                          $'    ${underline("Account stat:")}
   '$.     .,        ,.     .$'       Submission karma: ${blue(redditor.link_karma.toString())}
   'b,     '²«»«»«»²'     ,d'         Comment karma: ${blue(redditor.comment_karma.toString())}
-     '²?bn,,          ,,nd?²'       
+     '²?bn,,          ,,nd?²'        Is the bot banned from reddit? ${redditor.is_suspended ? bold("Yes it is banned") : bold("No it is not banned")}
        ,6$ ''²²²²²²²²'' $6,
      ,² ²$              $² ²,
      $  :$              $:  $
@@ -63,82 +68,29 @@ const subredditToPostOn: Array<string> = config.subredditToListen;
 for (const subreddit of subredditToPostOn)
 {
   /* set up the event */
-  const submissionStream = new SubmissionStream(snoowrap, {
-    subreddit: subreddit,
-    pollTime: config.submittionStreamOption.pollTime,
-    limit: config.submittionStreamOption.limit
-  });
+  if (config.shouldListenForNewSubmission)
+    new SubmissionStream(snoowrap, {
+      subreddit: subreddit,
+      pollTime: config.submittionStreamOption.pollTime,
+      limit: config.submittionStreamOption.limit
+    }).on("item", submissionhandler)
 
+  if (config.shouldListenForNewComment)
+    new CommentStream(snoowrap, {
+      subreddit: subreddit,
+      pollTime: config.commentStreamOption.pollTime,
+      limit: config.commentStreamOption.limit,
+    }).on("item", inboxHandler)
+    
   console.log(green(subreddit + " has be set up!"));
-
-  submissionStream.on("item", submissionhandler);
 }
+//@ts-ignore
 const inboxStream = new InboxStream(snoowrap, config.inboxStreamOption);
 
 let iteration = 0;
-const replied_m = "tion";
+const replied_m = "Replied to a comment!";
 
-inboxStream.on("item", async (notif: Snoowrap.PrivateMessage | Snoowrap.Comment) =>
-{
-  /* if (_.random(0, 1_000) % 95 === 0)
-  {
-    console.log(green("The random decided to not answer the on the comment."));
-    return;
-  } */
-  iteration++;
-  if (iteration % 50 === 0 && !detectDebug())
-    console.clear();
-  /**
-   * The notification message
-   */
-  const notif_body: string = notif.body;
-  try
-  {
-    let convo_history = notif.parent_id;
-    let reply: string = await cleverbot(notif_body);
-    if (config.shouldEmogify)
-      reply = generateEmojipasta(reply);
-    // sleep.msleep(_.random(2000, 22000));
-    let i = 0;
-    setTimeout(() =>
-    {
-      i++;
-      if (i > 1)
-        return Promise.resolve();
-      notif.reply(reply)
-        //@ts-ignore
-        .then(() =>
-        {
-          //@ts-ignore
-          if (!detectDebug()) // detect for debug cuz i want to show the amount of time submission have been replied to as I use chrome debugger to debug
-            console.log(rainbow(replied_m));
-          else
-            console.log(replied_m);
-        })
-        .catch(() => { });
-      if (!detectDebug())
-        console.log(rainbow(replied_m));
-      else
-        console.log(replied_m);
-    }, _.random(5000, 22000));
-  }
+if (config.shouldListenToInbox)
+  inboxStream.on("item", inboxHandler);
 
-  catch (e)
-  {
-
-    console.error(generateEmojipasta(e.toString()));
-    // sleep.msleep(_.random(2000, 22000));
-    notif.reply(e.toString())
-      //@ts-ignore
-      .then(() => { })
-      .catch(() => { });
-    if (!detectDebug())
-      console.log(rainbow(replied_m))
-    else
-      console.log(replied_m);
-  }
-});
-var detectDebug = function ()
-{
-  return process.env.NODE_ENV !== 'production';
-};
+export default snoowrap;

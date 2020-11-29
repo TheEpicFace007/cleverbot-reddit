@@ -4,7 +4,8 @@ import Snoowrap, { Subreddit } from "snoowrap";
 import
 {
   InboxStream,
-  SubmissionStream
+  SubmissionStream,
+  CommentStream
 } from "snoostorm";
 import "colors/lib/extendStringPrototype";
 import cleverbot from "cleverbot-free";
@@ -23,7 +24,7 @@ import
 }
   from "colors";
 import submissionhandler from "./handler/SubmissionHandler";
-import inboxHandler from "./handler/InboxHandler"
+import inboxHandler from "./handler/InboxHandler";
 import { table } from "console";
 
 
@@ -64,18 +65,24 @@ snoowrap.getMe().then(async (redditor: Snoowrap.RedditUser) =>
 
 const subredditToPostOn: Array<string> = config.subredditToListen;
 
-for (const subreddit  of subredditToPostOn)
+for (const subreddit of subredditToPostOn)
 {
   /* set up the event */
-  const submissionStream = new SubmissionStream(snoowrap, {
-    subreddit: subreddit,
-    pollTime: config.submittionStreamOption.pollTime,
-    limit: config.submittionStreamOption.limit
-  });
+  if (config.shouldListenForNewSubmission)
+    new SubmissionStream(snoowrap, {
+      subreddit: subreddit,
+      pollTime: config.submittionStreamOption.pollTime,
+      limit: config.submittionStreamOption.limit
+    }).on("item", submissionhandler)
 
+  if (config.shouldListenForNewComment)
+    new CommentStream(snoowrap, {
+      subreddit: subreddit,
+      pollTime: config.commentStreamOption.pollTime,
+      limit: config.commentStreamOption.limit,
+    }).on("item", inboxHandler)
+    
   console.log(green(subreddit + " has be set up!"));
-
-  submissionStream.on("item", submissionhandler);
 }
 //@ts-ignore
 const inboxStream = new InboxStream(snoowrap, config.inboxStreamOption);
@@ -83,6 +90,7 @@ const inboxStream = new InboxStream(snoowrap, config.inboxStreamOption);
 let iteration = 0;
 const replied_m = "Replied to a comment!";
 
-inboxStream.on("item", inboxHandler);
+if (config.shouldListenToInbox)
+  inboxStream.on("item", inboxHandler);
 
-export default snoowrap
+export default snoowrap;

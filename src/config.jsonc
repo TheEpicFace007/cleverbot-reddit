@@ -33,10 +33,27 @@
     // The default value is 22000
     "pollTime": 22000
   },
+  /* comments watcher setting */
+  "commentStreamOption": {
+    // The limit of submission to look for per poll time
+    // Don't set it too high or you might get ratelimited
+    // The default value is 10
+    "limit": 10,
+    // Amount of millisecond it'll look for message in the inbox of the bot
+    // The lower it'l be, the higher the chance of you getting rate limited 
+    // is (Don't set it too low!)
+    // The default value is 22000
+    "pollTime": 22000
+  },
   /* subreddit option */
   // Set the subreddit to listen for posts
   // You can set to r/all 
   "subredditToListen": [
-    "askreddit",
-  ]
+    "copypasta",
+    "arabfunny"
+  ],
+  /* toggle what the bot will listen for */
+  "shouldListenForNewComment": false,
+  "shouldListenForNewSubmission": true,
+  "shouldListenToInbox": true
 }

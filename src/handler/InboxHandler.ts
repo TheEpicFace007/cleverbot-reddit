@@ -69,7 +69,7 @@ export default async function (notif: Snoowrap.PrivateMessage | Snoowrap.Comment
   let reply: string;
   try
   {
-    past_user_message = snoowrap.getComment(notif.parent_id); // not to be confused with the bot message
+    past_user_message = snoowrap.getComment(notif.parent_id.replace("t3_", "")); // not to be confused with the bot message
   }
   catch
   {
@@ -78,7 +78,7 @@ export default async function (notif: Snoowrap.PrivateMessage | Snoowrap.Comment
   }
   try
   {
-    past_bot_message = snoowrap.getComment(past_user_message.parent_id);
+    past_bot_message = snoowrap.getComment(past_user_message.parent_id.replace("t3_", ""));
   }
   catch
   {

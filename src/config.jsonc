@@ -50,7 +50,8 @@
   // You can set to r/all 
   "subredditToListen": [
     "copypasta",
-    "arabfunny"
+    "arabfunny",
+    "askreddit"
   ],
   /* toggle what the bot will listen for */
   "shouldListenForNewComment": false,

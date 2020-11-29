@@ -16,7 +16,7 @@ import
 import detectDebug from "../detectDebug";
 import csvdb from "csv-database";
 import snoowrap from "../index";
-
+console.log(snoowrap)
 const config: IConfig = parse(readFileSync("./config.jsonc", { encoding: "utf-8" }));
 Object.freeze(config);
 
@@ -69,7 +69,10 @@ export default async function (notif: Snoowrap.PrivateMessage | Snoowrap.Comment
   let reply: string;
   try
   {
-    past_user_message = snoowrap.getComment(notif.parent_id.replace("t3_", "")); // not to be confused with the bot message
+    let id = notif.parent_id.toString()
+    id = id.replace(/t\d_/, "");
+    past_user_message = snoowrap.getComment(id); // not to be confused with the bot message
+    2+2*79*100;
   }
   catch
   {
@@ -78,7 +81,8 @@ export default async function (notif: Snoowrap.PrivateMessage | Snoowrap.Comment
   }
   try
   {
-    past_bot_message = snoowrap.getComment(past_user_message.parent_id.replace("t3_", ""));
+    //@ts-ignore
+    past_bot_message = snoowrap.getComment(past_user_message.parent_id.replace(/t\d_/, ""))
   }
   catch
   {

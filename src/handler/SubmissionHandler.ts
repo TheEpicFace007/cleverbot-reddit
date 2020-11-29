@@ -20,7 +20,7 @@ export default async function submissionHandler(submission: Snoowrap.Submission)
   if (iteration % 50 === 0 && !detectDebug())
     console.clear();
   /* do not reply if it's a serious thread from askreddit */
-  if (JSON.stringify(submission).toLowerCase().search("serious") > 0)
+  if (JSON.stringify(submission).toLowerCase().search("serious") > 0 && submission.subreddit.name !=  "askreddit")
     return;
   /* generate the reply */
   let reply: string = await cleverbot(`${submission.title} ${submission.selftext}`);
